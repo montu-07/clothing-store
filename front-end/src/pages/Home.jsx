@@ -128,7 +128,7 @@ const Home = () => {
               flexWrap: "wrap",
             }}
           >
-            {["Men", "Women", "T-Shirts", "Shirts"].map((label, index) => (
+            {["New Arrivals","Men", "Women","All"].map((label, index) => (
               <Button
                 key={index}
                 component={Link}

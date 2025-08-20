@@ -17,8 +17,26 @@ const cartSlice = createSlice({
     },
     removeFromCart: (state, { payload }) => state.filter(p => p.id !== payload),
     clearCart: () => []
-  }
+  },
+  updateQuantity: (state, action) => {
+    const { id, quantity } = action.payload;
+    const item = state.items.find((i) => i.id === id);
+    if (item && quantity > 0) {
+      item.quantity = quantity;
+    } else if (item && quantity <= 0) {
+      // agar 0 ya negative ho gaya to remove kar do
+      state.items = state.items.filter((i) => i.id !== id);
+    }
+  },
 });
 
-export const { addToCart, incrementQuantity, decrementQuantity, removeFromCart, clearCart } = cartSlice.actions;
+export const {
+  addToCart,
+  removeFromCart,
+  incrementQuantity,
+  decrementQuantity,
+  updateQuantity,
+  clearCart,
+} = cartSlice.actions;
+
 export default cartSlice.reducer;

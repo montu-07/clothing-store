@@ -1,23 +1,30 @@
 import React, { useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { fetchProducts } from "../redux/slices/productSlice";
 import ProductList from "../components/ProductList";
 
-export default function Shirts() {
+const Shirts = () => {
   const dispatch = useDispatch();
-  const { items, loading } = useSelector((state) => state.products);
+  const { items, status } = useSelector((state) => state.products);
 
-useEffect(() => {
-  if (items.length === 0) {
-    dispatch(fetchProducts());
-  }
-}, [dispatch, items.length]);
+  useEffect(() => {
+    if (!items.length) {
+      dispatch(fetchProducts());
+    }
+  }, [dispatch, items.length]);
 
-  const list = items.filter(
-    (p) => p.category.toLowerCase() === "shirts"
+const shirts = items.filter((p) => {
+  const cat = p.category?.toLowerCase() || "";
+  return cat.includes("shirt") && !cat.includes("t-shirt");
+});
+
+
+  return (
+    <div>
+      <h2 style={{ textAlign: "center", margin: "20px 0" }}>Shirts</h2>
+      <ProductList products={shirts} loading={status === "loading"} />
+    </div>
   );
+};
 
-  if (loading) return <p style={{ textAlign: "center" }}>Loading...</p>;
-
-  return <ProductList products={list} />;
-}
+export default Shirts;
