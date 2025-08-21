@@ -1,42 +1,87 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+// src/App.jsx
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
-import NewArrivals from "./pages/NewArrivals";
-import Men from "./pages/Men";
-import Women from "./pages/Women";
-import All from "./pages/AllProducts";
-import ProductDetail from "./pages/ProductDetail";
 import Cart from "./components/Cart";
 import Checkout from "./pages/Checkout";
 import OrderPlaced from "./pages/OrderPlaced";
-import AdminPanel from "./pages/AdminPanel";
-import { useDispatch } from "react-redux";
-import { fetchProducts } from "./redux/slices/productSlice";
-import { useEffect } from "react";
+import NewArrivals from "./pages/NewArrivals";
+import Men from "./pages/Men";
+import Women from "./pages/Women";
+import TopBottomWear from "./pages/TopBottomWear";
+import TShirts from "./pages/TShirts";
+import Shirts from "./pages/Shirts";
+import ProductDetail from "./pages/ProductDetail";
+
+// Auth Pages
+import Login from "./pages/auth/Login";
+import SignUp from "./pages/auth/SignUp";
+import ForgotPassword from "./pages/auth/ForgotPassword";
 
 function App() {
-    const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch(fetchProducts());
-  }, [dispatch]);
+  // Authentication state (from redux or localStorage)
+  const isAuthenticated = useSelector((state) => state.auth?.isAuthenticated) || false;
 
   return (
-    <BrowserRouter>
-      <Navbar />
+    <Router>
+      {isAuthenticated && <Navbar />}
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/NewArrivals" element={<NewArrivals />} />
-        <Route path="/Men" element={<Men />} />
-        <Route path="/Women" element={<Women />} />
-        <Route path="/All" element={<All />} />
-        <Route path="/product/:id" element={<ProductDetail />} />
-        <Route path="/cart" element={<Cart />} />
-        <Route path="/checkout" element={<Checkout />} />
-        <Route path="/order-placed" element={<OrderPlaced />} />
-        <Route path="/admin" element={<AdminPanel />} />
+        {/* Auth Routes */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<SignUp />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+
+        {/* Protected Routes */}
+        <Route
+          path="/"
+          element={isAuthenticated ? <Home /> : <Navigate to="/login" replace />}
+        />
+        <Route
+          path="/cart"
+          element={isAuthenticated ? <Cart /> : <Navigate to="/login" replace />}
+        />
+        <Route
+          path="/checkout"
+          element={isAuthenticated ? <Checkout /> : <Navigate to="/login" replace />}
+        />
+        <Route
+          path="/order-placed"
+          element={isAuthenticated ? <OrderPlaced /> : <Navigate to="/login" replace />}
+        />
+
+        <Route
+          path="/new-arrivals"
+          element={isAuthenticated ? <NewArrivals /> : <Navigate to="/login" replace />}
+        />
+        <Route
+          path="/men"
+          element={isAuthenticated ? <Men /> : <Navigate to="/login" replace />}
+        />
+        <Route
+          path="/women"
+          element={isAuthenticated ? <Women /> : <Navigate to="/login" replace />}
+        />
+        <Route
+          path="/top-bottom-wear"
+          element={isAuthenticated ? <TopBottomWear /> : <Navigate to="/login" replace />}
+        />
+        <Route
+          path="/t-shirts"
+          element={isAuthenticated ? <TShirts /> : <Navigate to="/login" replace />}
+        />
+        <Route
+          path="/shirts"
+          element={isAuthenticated ? <Shirts /> : <Navigate to="/login" replace />}
+        />
+        <Route
+          path="/product/:id"
+          element={isAuthenticated ? <ProductDetail /> : <Navigate to="/login" replace />}
+        />
       </Routes>
-    </BrowserRouter>
+    </Router>
   );
 }
+
 export default App;
