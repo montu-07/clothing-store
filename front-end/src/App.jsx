@@ -36,7 +36,10 @@ function App() {
         {/* Protected Routes */}
         <Route
           path="/"
-          element={isAuthenticated ? <Home /> : <Navigate to="/login" replace />}
+          element=
+          {isAuthenticated ? 
+          <Home /> 
+            : <Navigate to="/login" replace />}
         />
         <Route
           path="/cart"

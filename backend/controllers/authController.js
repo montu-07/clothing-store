@@ -1,49 +1,49 @@
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
-import db from "../db/db.js";
-
-const JWT_SECRET = "supersecretkey"; // .env me rakho
+import * as authService from "../services/authService.js";
 
 export const signup = async (req, res) => {
-  const { name, email, password } = req.body;
   try {
-    const existingUser = await db("users").where({ email }).first();
-    if (existingUser) return res.status(400).json({ error: "User already exists" });
+    const { name, email, password } = req.body;
+    if (!name || !email || !password) {
+      return res.status(400).json({ error: "All fields are required" });
+    }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const [userId] = await db("users").insert({ name, email, password: hashedPassword });
-
-    res.json({ message: "User created successfully", userId });
+    const userId = await authService.createUser({ name, email, password });
+    return res.json({ message: "User created successfully", userId });
   } catch (err) {
-    res.status(500).json({ error: "Server error" });
+    return res.status(400).json({ error: err.message });
   }
 };
 
 export const login = async (req, res) => {
-  const { email, password } = req.body;
   try {
-    const user = await db("users").where({ email }).first();
-    if (!user) return res.status(400).json({ error: "User not found" });
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({ error: "Email and password required" });
+    }
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ error: "Invalid credentials" });
-
-    const token = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: "1d" });
-
-    res.json({ success: true, message: "Login successful", user: { id: user.id, name: user.name, email: user.email }, token });
+    const { user, token } = await authService.loginUser({ email, password });
+    return res.json({
+      success: true,
+      message: "Login successful",
+      user: { id: user.id, name: user.name, email: user.email },
+      token,
+    });
   } catch (err) {
-    res.status(500).json({ error: "Server error" });
+    return res.status(400).json({ error: err.message });
   }
 };
 
 export const forgotPassword = async (req, res) => {
-  const { email } = req.body;
   try {
-    const user = await db("users").where({ email }).first();
-    if (!user) return res.status(400).json({ error: "User not found" });
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ error: "Email is required" });
 
-    res.json({ message: "Password reset link sent to " + email });
+    const user = await db("users").where({ email }).first();
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    // 🔹 Here you’d send an actual email in production
+    return res.json({ message: `Password reset link sent to ${email}` });
   } catch (err) {
-    res.status(500).json({ error: "Server error" });
+    return res.status(500).json({ error: "Server error" });
   }
 };

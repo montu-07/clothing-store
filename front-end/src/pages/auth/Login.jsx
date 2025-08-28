@@ -180,7 +180,8 @@ export default function Login() {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                p: 4.739,
+                p: 4,
+                ml:1.3
               }}
             >
               <motion.img
